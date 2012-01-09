@@ -1,0 +1,12 @@
+{application, beas,
+ [
+  {description, "beas - basic erlang account system"},
+  {vsn, "0.3"},
+  {modules, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {env, []}
+ ]
+}.
