@@ -33,7 +33,9 @@ beas_test_() ->
      {"Add Location",
        fun new_location/0},
      {"Read Locations",
-       fun user_locations/0}
+       fun user_locations/0},
+     {"Username Existence",
+       fun username_exists/0}
     ]
   }.
 
@@ -98,6 +100,12 @@ user_locations() ->
                  {start, <<"300">>},
                  {stop, <<"600">>},
                  {recur, <<"daily">>}]], Locations).
+
+username_exists() ->
+  Yes = beas:'username-exists'(tester, matt),
+   No = beas:'username-exists'(tester, poopin),
+  ?assertEqual(true, Yes),
+  ?assertEqual(false, No).
 
 %%%----------------------------------------------------------------------
 %%% Setup / Cleanup

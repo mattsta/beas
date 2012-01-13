@@ -87,6 +87,9 @@
 ;;;--------------------------------------------------------------------
 ;;; User Reading
 ;;;--------------------------------------------------------------------
+(defun username-exists (redis username)
+ (: er exists redis (key-username-to-uid-ptr username)))
+
 (defun user-username (redis uid)
  (: er hget redis (key-user-hash uid) 'username))
 
