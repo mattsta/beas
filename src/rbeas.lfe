@@ -18,6 +18,7 @@
     (zs-call user-feature-del ,redis-name (uid feature))
     (zs-call user-feature-incr ,redis-name (uid feature delta))
     (zs-call username-exists ,redis-name (username))
+    (zs-call username-to-uid ,redis-name (username))
     (zs-call user-username ,redis-name (uid))
     (zs-call user-email ,redis-name (uid))
     (zs-call user-password-match ,redis-name (uid attempted-password))

@@ -90,6 +90,9 @@
 (defun username-exists (redis username)
  (: er exists redis (key-username-to-uid-ptr username)))
 
+(defun username-to-uid (redis username)
+ (: er get redis (key-username-to-uid-ptr username)))
+
 (defun user-username (redis uid)
  (: er hget redis (key-user-hash uid) 'username))
 
