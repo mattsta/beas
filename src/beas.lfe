@@ -39,6 +39,12 @@
  ([uid] (: eru er_key 'marks uid)))
 
 ;;;--------------------------------------------------------------------
+;;; helpful conversions
+;;;--------------------------------------------------------------------
+(defsyntax to-int
+ ([redis-val] (list_to_integer (binary_to_list redis-val))))
+
+;;;--------------------------------------------------------------------
 ;;; User Creation
 ;;;--------------------------------------------------------------------
 (defun user-create (redis username email password)
@@ -107,8 +113,7 @@
  (=:= computed-attempt existing-password)))
 
 (defun user-signup-ts (redis uid)
- (list_to_integer
-  (binary_to_list (: er hget redis (key-user-hash uid) 'ts-signup))))
+ (to-int (: er hget redis (key-user-hash uid) 'ts-signup)))
 
 (defun user-is-disabled (redis uid)
  (: er hexists redis (key-user-hash uid) 'disabled))
@@ -142,7 +147,7 @@
  (user-feature-value redis uid 'subscription))
 
 (defun user-subscription-expires (redis uid)
- (user-feature-value redis uid 'subscription-expires))
+ (to-int (user-feature-value redis uid 'subscription-expires)))
 
 ;;;--------------------------------------------------------------------
 ;;; Location Updating
