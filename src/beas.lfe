@@ -132,9 +132,9 @@
 ;;;--------------------------------------------------------------------
 (defun user-subscribe (redis uid plan expires)
  (user-feature-set redis uid 'subscription plan)
- (user-subscribe-expiration redis uid expires))
+ (user-subscribe-expire redis uid expires))
 
-(defun user-subscribe-expiration (redis uid expires)
+(defun user-subscribe-expire (redis uid expires)
  (user-feature-set redis uid 'subscription-expires expires))
 
 (defun user-unsubscribe (redis uid)
