@@ -7,8 +7,13 @@
 (defsyntax key-email-to-uid-ptr
  ([email] (: eru er_key 'email email)))
 
-(defsyntax key-username-to-uid-ptr
- ([username] (: eru er_key 'username username)))
+; store all usernames as lowercase
+(defun key-username-to-uid-ptr
+ ([username] (when (is_list username))
+  (: eru er_key 'username (: string to_lower username)))
+ ([username] (when (is_binary username))
+  (key-username-to-uid-ptr
+   (: binary characters_to_list (binary_to_list username)))))
 
 (defsyntax key-priv-level-ptr
  ([priv-level] (: eru er_key 'priv-level priv-level)))

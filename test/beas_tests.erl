@@ -44,7 +44,9 @@ beas_test_() ->
 %%%----------------------------------------------------------------------
 create_user() ->
   Uid = beas:'user-create'(tester, matt, "matt@matt.matt", "mattpass"),
+  Uid2 = beas:'user-create'(tester, "日本", "matt@matt.matt", "mattpass"),
   ?assertEqual(1, Uid),
+  ?assertEqual(2, Uid2),
   Email = beas:'user-email'(tester, 1),
   ?assertEqual(<<"matt@matt.matt">>, Email).
 
