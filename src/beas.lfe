@@ -27,12 +27,6 @@
 (defsyntax key-user-feature-hash
  ([uid] (: eru er_key 'user uid 'features)))
 
-(defsyntax key-counter-user
- ([] (: eru er_key 'counter 'user)))
-
-(defsyntax key-counter-location-marker
- ([] (: eru er_key 'counter 'location-marker)))
-
 (defsyntax key-location-marker
  ([marker-id] (: eru er_key 'marker marker-id)))
 
@@ -45,6 +39,15 @@
 
 (defsyntax key-user-location-marker
  ([uid] (: eru er_key 'marks uid)))
+
+;;;--------------------------------------------------------------------
+;;; Counter Keys
+;;;--------------------------------------------------------------------
+(defsyntax key-counter-user
+ ([] (: eru er_key 'counter 'user)))
+
+(defsyntax key-counter-location-marker
+ ([] (: eru er_key 'counter 'location-marker)))
 
 ;;;--------------------------------------------------------------------
 ;;; helpful conversions
