@@ -5,7 +5,7 @@
 ;;; Keys
 ;;;--------------------------------------------------------------------
 (defsyntax key-email-to-uid-ptr
- ([email] (: eru er_key 'email email)))
+ ([in-email] (: eru er_key 'email in-email)))
 
 ; store all usernames as lowercase
 (defun key-username-to-uid-ptr
@@ -19,7 +19,7 @@
    (atom_to_binary username 'utf8))))
 
 (defsyntax key-priv-level-ptr
- ([priv-level] (: eru er_key 'priv-level priv-level)))
+ ([in-priv-level] (: eru er_key 'priv-level in-priv-level)))
 
 (defsyntax key-user-hash
  ([uid] (: eru er_key 'user uid)))
