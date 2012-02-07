@@ -35,7 +35,9 @@ beas_test_() ->
      {"Read Locations",
        fun user_locations/0},
      {"Username Existence",
-       fun username_exists/0}
+       fun username_exists/0},
+     {"Email Existence",
+       fun email_exists/0}
     ]
   }.
 
@@ -60,11 +62,11 @@ create_user() ->
   ?assertEqual(user_exists, UidNO_U),
   ?assertEqual(email_exists, UidNO_E),
   % test email exists error when changing email ddress
-  NewEmail = beas:'user-email'(tester, matt, "matt@matt2.matt"),
+  NewEmail = beas:'user-email'(tester, Uid, "matt@matt2.matt"),
   ?assertEqual(email_exists, NewEmail),
   % test chaning email address actually works
-  NewEmail2 = beas:'user-email'(tester, matt, "matt@matt2.matt-reallynew.com"),
-  ?assertEqual(true, NewEmail2).
+  NewEmail2 = beas:'user-email'(tester, Uid, "matt@matt2.matt-reallynew.com"),
+  ?assertEqual(false, NewEmail2). % "false" means "field was updated properly."
 
 
 deny_create_user() ->
@@ -125,6 +127,16 @@ username_exists() ->
    No = beas:'username-exists'(tester, poopin),
   ?assertEqual(true, Yes),
   ?assertEqual(false, No).
+
+email_exists() ->
+  Yes = beas:'email-exists'(tester, "matt@matt2.matt-reallynew.com"),
+   No = beas:'email-exists'(tester, zOOOOOOOOOOOOO),
+  ?assertEqual(true, Yes),
+  ?assertEqual(false, No),
+  % This is the address existing before an email update.  make sure it doesn't
+  % exist any longer:
+  Nope = beas:'email-exists'(tester, "matt@matt.matt"),
+  ?assertEqual(false, Nope).
 
 %%%----------------------------------------------------------------------
 %%% Setup / Cleanup

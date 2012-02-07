@@ -100,19 +100,18 @@
 ;;; User Updating
 ;;;--------------------------------------------------------------------
 (defun user-email (redis uid email)
- (let ((existing-email (user-email redis uid)))
-  (atomic-set (key-email-to-uid-ptr email) ; attempt to set new email addr
-   ; set success
-   ((user-email-raw redis uid existing-email email))
-   ; set failure
-   ('email_exists))))
+ (atomic-set (key-email-to-uid-ptr email) ; attempt to set new email addr
+  ; set success
+  ((user-email-raw redis uid (user-email redis uid) email))
+  ; set failure
+  ('email_exists)))
 
-(defun user-email-raw (redis uid existing-email email)
+(defun user-email-raw (redis uid existing-email new-email)
  (case existing-email
   ('nil 'nil) ; this is an initial set, so nothing to pre-delete
   (e (: er del redis (key-email-to-uid-ptr e)))) ; remove existing email to UID
- (: er set redis (key-email-to-uid-ptr email) uid) ; add new Email->UID
- (: er hset redis (key-user-hash uid) 'email email)) ; update email in user hash
+ (: er set redis (key-email-to-uid-ptr new-email) uid) ; add new email->UID
+ (: er hset redis (key-user-hash uid) 'email new-email)) ; update user hash
 
 (defun user-disable (redis uid)
  (: er hset redis (key-user-hash uid) 'disabled (now-s)))
@@ -134,6 +133,9 @@
 ;;;--------------------------------------------------------------------
 (defun username-exists (redis username)
  (: er exists redis (key-username-to-uid-ptr username)))
+
+(defun email-exists (redis email)
+ (: er exists redis (key-email-to-uid-ptr email)))
 
 (defun username-to-uid (redis username)
  (: er get redis (key-username-to-uid-ptr username)))
