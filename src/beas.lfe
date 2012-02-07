@@ -13,7 +13,10 @@
   (: eru er_key 'username (: string to_lower username)))
  ([username] (when (is_binary username))
   (key-username-to-uid-ptr
-   (: binary characters_to_list (binary_to_list username)))))
+   (: unicode characters_to_list (binary_to_list username))))
+ ([username] (when (is_atom username))
+  (key-username-to-uid-ptr
+   (atom_to_binary username 'utf8))))
 
 (defsyntax key-priv-level-ptr
  ([priv-level] (: eru er_key 'priv-level priv-level)))
