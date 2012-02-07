@@ -56,19 +56,35 @@
  ([redis-val] (list_to_integer (binary_to_list redis-val))))
 
 ;;;--------------------------------------------------------------------
+;;; Atomic Helpers
+;;;--------------------------------------------------------------------
+(defmacro atomic-set (key success failure)
+ `(case (: er setnx redis ,key 'test)
+   ('true ,@success)
+   ('false ,@failure)))
+
+;;;--------------------------------------------------------------------
 ;;; User Creation
 ;;;--------------------------------------------------------------------
 (defun user-create (redis username email password)
- (case (: er setnx redis (key-username-to-uid-ptr username) 'test)
-  ('true (let* ((uid (: er incr redis (key-counter-user)))
-                (user-key (key-user-hash uid)))
-          (: er set redis (key-username-to-uid-ptr username) uid)
-          (: er hset redis user-key 'username username)
-          (user-email redis uid email)
-          (: er hset redis user-key 'ts-signup (now-s))
-          (password-set redis user-key password)
-          uid))
-  ('false 'user_exists)))
+ (atomic-set (key-username-to-uid-ptr username)
+  ; success -- the username didn't exist
+  ((atomic-set (key-email-to-uid-ptr email)
+   ; success -- the email didn't exist
+   ((let* ((uid (: er incr redis (key-counter-user)))
+          (user-key (key-user-hash uid)))
+    (: er set redis (key-username-to-uid-ptr username) uid)
+    (: er hset redis user-key 'username username)
+    (user-email-raw redis uid 'nil email)
+    (: er hset redis user-key 'ts-signup (now-s))
+    (password-set redis user-key password)
+    uid))
+   ; failure -- the username didn't exist, but the email did
+   ((: er del redis (key-username-to-uid-ptr username)) ; free up the username
+                                                  ; we aren't making the account
+   'email_exists)))
+  ; failure -- username already exists
+  ('user_exists)))
 
 (defun password-set (redis key password)
  (let ((cycles 400000))
@@ -84,7 +100,19 @@
 ;;; User Updating
 ;;;--------------------------------------------------------------------
 (defun user-email (redis uid email)
- (: er hset redis (key-user-hash uid) 'email email))
+ (let ((existing-email (user-email redis uid)))
+  (atomic-set (key-email-to-uid-ptr email) ; attempt to set new email addr
+   ; set success
+   ((user-email-raw redis uid existing-email email))
+   ; set failure
+   ('email_exists))))
+
+(defun user-email-raw (redis uid existing-email email)
+ (case existing-email
+  ('nil 'nil) ; this is an initial set, so nothing to pre-delete
+  (e (: er del redis (key-email-to-uid-ptr e)))) ; remove existing email to UID
+ (: er set redis (key-email-to-uid-ptr email) uid) ; add new Email->UID
+ (: er hset redis (key-user-hash uid) 'email email)) ; update email in user hash
 
 (defun user-disable (redis uid)
  (: er hset redis (key-user-hash uid) 'disabled (now-s)))
@@ -109,6 +137,9 @@
 
 (defun username-to-uid (redis username)
  (: er get redis (key-username-to-uid-ptr username)))
+
+(defun email-to-uid (redis email)
+ (: er get redis (key-email-to-uid-ptr email)))
 
 (defun user-username (redis uid)
  (: er hget redis (key-user-hash uid) 'username))

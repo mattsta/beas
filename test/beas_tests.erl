@@ -44,11 +44,28 @@ beas_test_() ->
 %%%----------------------------------------------------------------------
 create_user() ->
   Uid = beas:'user-create'(tester, matt, "matt@matt.matt", "mattpass"),
-  Uid2 = beas:'user-create'(tester, "日本", "matt@matt.matt", "mattpass"),
+  % username stored: "username:\xc3\xa6\xc2\x97\xc2\xa5\xc3\xa6\xc2\x9c\xc2\xac"
+  Uid2 = beas:'user-create'(tester, "日本", "matt@matt2.matt", "mattpass"),
   ?assertEqual(1, Uid),
   ?assertEqual(2, Uid2),
   Email = beas:'user-email'(tester, 1),
-  ?assertEqual(<<"matt@matt.matt">>, Email).
+  ?assertEqual(<<"matt@matt.matt">>, Email),
+  UidA = beas:'email-to-uid'(tester, "matt@matt.matt"),
+  ?assertEqual(<<"1">>, UidA),
+  UidB = beas:'email-to-uid'(tester, "matt@matt2.matt"),
+  ?assertEqual(<<"2">>, UidB),
+  % test user exists and email exists errors
+  UidNO_U = beas:'user-create'(tester, "日本", "matt@matt2.matt", "mattpass"),
+  UidNO_E = beas:'user-create'(tester, "日本p", "matt@matt2.matt", "mattpass"),
+  ?assertEqual(user_exists, UidNO_U),
+  ?assertEqual(email_exists, UidNO_E),
+  % test email exists error when changing email ddress
+  NewEmail = beas:'user-email'(tester, matt, "matt@matt2.matt"),
+  ?assertEqual(email_exists, NewEmail),
+  % test chaning email address actually works
+  NewEmail2 = beas:'user-email'(tester, matt, "matt@matt2.matt-reallynew.com"),
+  ?assertEqual(true, NewEmail2).
+
 
 deny_create_user() ->
   Error = beas:'user-create'(tester, matt, nil, nil),
