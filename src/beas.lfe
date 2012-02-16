@@ -5,12 +5,12 @@
 ;;; Keys
 ;;;--------------------------------------------------------------------
 (defsyntax key-email-to-uid-ptr
- ([in-email] (: eru er_key 'email in-email)))
+ ([in-email] (: eru er_key 'beas 'email in-email)))
 
 ; store all usernames as lowercase
 (defun key-username-to-uid-ptr
  ([username] (when (is_list username))
-  (: eru er_key 'username (: string to_lower username)))
+  (: eru er_key 'beas 'username (: string to_lower username)))
  ([username] (when (is_binary username))
   (key-username-to-uid-ptr
    (: unicode characters_to_list (binary_to_list username))))
@@ -19,35 +19,35 @@
    (atom_to_binary username 'utf8))))
 
 (defsyntax key-priv-level-ptr
- ([in-priv-level] (: eru er_key 'priv-level in-priv-level)))
+ ([in-priv-level] (: eru er_key 'beas 'priv-level in-priv-level)))
 
 (defsyntax key-user-hash
- ([uid] (: eru er_key 'user uid)))
+ ([uid] (: eru er_key 'beas 'user uid)))
 
 (defsyntax key-user-feature-hash
- ([uid] (: eru er_key 'user uid 'features)))
+ ([uid] (: eru er_key 'beas 'user uid 'features)))
 
 (defsyntax key-location-marker
- ([marker-id] (: eru er_key 'marker marker-id)))
+ ([marker-id] (: eru er_key 'beas 'marker marker-id)))
 
 (defsyntax key-payment-provider-uid-map
  ([payment-provider provider-uid]
-  (: eru er_key 'provider-map payment-provider provider-uid)))
+  (: eru er_key 'beas 'provider-map payment-provider provider-uid)))
 
 (defsyntax key-payment-record
- ([uid] (: eru er_key 'payments uid)))
+ ([uid] (: eru er_key 'beas 'payments uid)))
 
 (defsyntax key-user-location-marker
- ([uid] (: eru er_key 'marks uid)))
+ ([uid] (: eru er_key 'beas 'marks uid)))
 
 ;;;--------------------------------------------------------------------
 ;;; Counter Keys
 ;;;--------------------------------------------------------------------
 (defsyntax key-counter-user
- ([] (: eru er_key 'counter 'user)))
+ ([] (: eru er_key 'beas 'counter 'user)))
 
 (defsyntax key-counter-location-marker
- ([] (: eru er_key 'counter 'location-marker)))
+ ([] (: eru er_key 'beas 'counter 'location-marker)))
 
 ;;;--------------------------------------------------------------------
 ;;; helpful conversions
@@ -226,10 +226,12 @@
 ;;; Payment Updating
 ;;;--------------------------------------------------------------------
 (defun payment-uid-map-set (redis provider provider-id uid)
+ ; this er_key isn't a 'beas key, it's just a concat of provider:provider-id
  (user-feature-set redis uid 'payment-uid (: eru er_key provider provider-id))
  (: er set (key-payment-provider-uid-map provider provider-id) uid))
 
 (defun payment-record (redis uid payment-provider invoice-id)
+ ; this er_key isn't a 'beas key, it's just a concat of provider:invoice-id
  (: er lpush redis (key-payment-record uid)
   (: eru er_key payment-provider invoice-id)))
 
