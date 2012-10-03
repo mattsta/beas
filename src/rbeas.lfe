@@ -30,7 +30,7 @@
     (zs-call user-feature-exists ,redis-name (uid feature))
     (zs-call user-features ,redis-name (uid))
     (zs-call user-subscribe ,redis-name (uid plan expires))
-    (zs-call user-subscribe-expiration ,redis-name (uid expires))
+    (zs-call user-subscribe-expire ,redis-name (uid expires))
     (zs-call user-unsubscribe ,redis-name (uid))
     (zs-call user-subscription ,redis-name (uid))
     (zs-call user-subscription-expires ,redis-name (uid))
