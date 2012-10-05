@@ -27,6 +27,8 @@
     (zs-call user-signup-ts ,redis-name (uid))
     (zs-call user-is-disabled ,redis-name (uid))
     (zs-call user-feature-value ,redis-name (uid feature))
+    (zs-call user-feature-get ,redis-name (uid feature))
+    (zs-call user-feature ,redis-name (uid feature))
     (zs-call user-feature-exists ,redis-name (uid feature))
     (zs-call user-features ,redis-name (uid))
     (zs-call user-subscribe ,redis-name (uid plan expires))

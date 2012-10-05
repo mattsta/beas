@@ -165,6 +165,14 @@
 (defun user-feature-value (redis uid feature)
  (: er hget redis (key-user-feature-hash uid) feature))
 
+; yes, this is redundant, but -value is dumb
+(defun user-feature-get (redis uid feature)
+ (user-feature-value redis uid feature))
+
+; yes, this is redundant, but -value is dumb
+(defun user-feature (redis uid feature)
+ (user-feature-value redis uid feature))
+
 (defun user-feature-exists (redis uid feature)
  (: er hexists redis (key-user-feature-hash uid) feature))
 
