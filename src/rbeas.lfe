@@ -9,6 +9,7 @@
 (defmacro mk-beas-tied-to-redis-name
  ([redis-name]
   `(progn
+    (zs-call nouser-create ,redis-name (username))
     (zs-call user-create ,redis-name (username email password))
     (zs-call password-set ,redis-name (key password))
     (zs-call user-email ,redis-name (uid email))

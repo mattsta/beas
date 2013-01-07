@@ -66,6 +66,11 @@
 ;;;--------------------------------------------------------------------
 ;;; User Creation
 ;;;--------------------------------------------------------------------
+(defun nouser-create (redis username)
+ (atomic-set (key-username-to-uid-ptr username)
+  ('success)
+  ('already_exists)))
+
 (defun user-create (redis username email password)
  (atomic-set (key-username-to-uid-ptr username)
   ; success -- the username didn't exist
